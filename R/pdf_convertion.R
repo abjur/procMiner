@@ -9,7 +9,6 @@ formatos <- function(orgao = '8', tr = '26'){
   )
 }
 
-#coment
 pdf2text <- function(a, keep_file = F, new_file = "repo.txt"){
   if(file.size(a) > 3000){
     system(sprintf("pdftotext %s %s", a,new_file))
