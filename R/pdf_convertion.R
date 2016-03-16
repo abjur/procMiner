@@ -9,9 +9,16 @@ formatos <- function(orgao = '8', tr = '26'){
   )
 }
 
-pdf2text <- function(a, keep_file = F, new_file = "repo.txt"){
-  if(file.size(a) > 3000){
-    system(sprintf("pdftotext %s %s", a,new_file))
+pdf2text <- function(a, keep_file = F, new_file = "repo.txt", raw = F, first_pg = NA, last_pg = NA){
+  bash = ifelse(raw,'pdftotext -raw','pdftotext')
+  bash = ifelse(is.na(first_pg),bash,paste(bash,'-f',first_pg))
+  bash = ifelse(is.na(last_pg),bash,paste(bash,'-l',last_pg))
+  bash = paste(bash,a,new_file)
+  
+  if(!file.exists(a)){return('')}
+  
+  if(file.size(a) > 5000){
+    system(bash)
     text = readr::read_file(new_file)
     ifelse(keep_file,NA,file.remove(new_file))
   } else {
@@ -22,11 +29,12 @@ pdf2text <- function(a, keep_file = F, new_file = "repo.txt"){
 
 encontra_processos <- function(text, orgao = '8', tr = '26'){
   text %>%
-    stringi::stri_replace_all(regex = '[\n\f\r]', replacement = '') %>%
+    stringi::stri_replace_all(regex = '[\n]', replacement = '')%>%
+    stringi::stri_replace_all(regex = '\f[0-9].*de2016|[\f\r]', replacement = '') %>%
     stringi::stri_extract_all(regex = formatos(orgao,tr)) %>%
     dplyr::first() %>%
     dplyr::data_frame() %>%
-    setNames(c('n_processo'))
+    setNames('n_processo')
 }
 
 filtra_anos <- function(processos, anos = seq(2009,2015)){
@@ -48,5 +56,5 @@ extrai_processos <- function(lista_arquivos, orgao = '8', tr = '26'){
     dplyr::group_by(arq) %>%
     dplyr::do(extrai_processos_arq(.$arq, orgao,tr)) %>%
     dplyr::ungroup() %>%
-    dplyr::filter(complete.cases(.))
+    dplyr::distinct(n_processo)
 }
