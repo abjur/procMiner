@@ -85,20 +85,20 @@ tipo_n_procesos <- function(d){
     table()
 }
 
-paste_invertido <- function(s1,s2, s = "", c = NULL, i = F){
-  stringi::stri_c(s2,s1, sep = s, collapse = c, ignore_null = i)
-}
+#' @export
+revstr <- function(x) sapply(lapply(strsplit(x, NULL), rev), paste, collapse="")
 
+#' Encontra a merda do digito verificador de um numero cnj
+#'
 #' @export
 calcula_digito <- function(num, monta = FALSE) {
-  n1 <- sprintf('%02d', as.numeric(substr(num, 1, 7)) %% 97)
-  n2 <- sprintf('%02d', as.numeric(sprintf('%s%s', n1, substr(num, 8, 14))) %% 97)
-  n3 <- sprintf('%02d', 98 - (as.numeric(sprintf('%s%s', n2, substr(num, 5, 20))) %% 97))
-  
-  
-  dig <- sprintf('%02d', as.integer(98 - ((as.numeric(revstr(num)) * 100) %% 97)))
-  
-  
+  NNNNNNN <- substr(num,  1L,  7L)
+  AAAA <-    substr(num,  8L, 11L)
+  JTR <-     substr(num, 12L, 14L)
+  OOOO <-    substr(num, 15L, 18L)
+  n1 <- sprintf('%02d', as.numeric(NNNNNNN) %% 97)
+  n2 <- sprintf('%02d', as.numeric(sprintf('%s%s%s', n1, AAAA, JTR)) %% 97)
+  n3 <- sprintf('%02d', 98 - ((as.numeric(sprintf('%s%s', n2, OOOO)) * 100) %% 97))
   dig <- n3
   if(monta) {
     return(sprintf('%s%s%s', substr(num, 1, 7), dig, substr(num, 8, 18)))
@@ -106,12 +106,14 @@ calcula_digito <- function(num, monta = FALSE) {
   return(dig)
 }
 
+#' 
 #' @export 
-saj2cnj <- function(nro_processo){
+saj2cnj <- function(nro_processo, orgao, tr){
   nro_processo %>% 
     stringr::str_split_fixed('[\\-\\.]',4) %>%
     data.frame() %>%
-    dplyr::mutate(x5 = paste(X1,X2))
-  setNames('nro_saj')
-  paste_invertido(c('0','20','0',''))
+    dplyr::transmute(nro_processo = sprintf('0%s20%s%s%s0%s',X3,X2,orgao,tr,X1),
+      dig = calcula_digito(nro_processo),
+      nro_processo = sprintf('0%s-%s.20%s.%s.%s.0%s',X3,dig,X2,orgao,tr,X1)) %>% 
+    dplyr::select(nro_processo)
 }
