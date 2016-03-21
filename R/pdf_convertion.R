@@ -4,11 +4,11 @@ formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = '8', tr = 
     #formato CNJ - 2008
     ifelse(cnj,sprintf('[0-9]{7}\\-[0-9]{2}\\.[0-9]{4}\\.%s\\.%s\\.[0-9]{4}',orgao,tr),''),
     #nro saj
-    ifelse(saj,'|[0-9]{3}\\.[0-9]{2}\\.[0-9]{6}\\-[0-9]{1}',''),
+    ifelse(saj,'|[0-9]{3}\\.[0-9]{2}\\.[0-9]{6}\\-?[0-9]{1}?',''),
     #nro que aparece no tjal 1
     ifelse(tjal,'|[0-9]{5}\\-[0-9]{1}\\.[0-9]{4}\\.[0-9]{3}',''),
     #prodesp
-    ifelse(prodesp,'|[0-9]{3}\\.[0-9]{2}\\.[0-9]{4}\\.[0-9]{6}\\-[0-9]','')
+    ifelse(prodesp,'|[0-9]{3}\\.[0-9]{2}\\.[0-9]{4}\\.[0-9]{6}\\-?[0-9]?','')
   )
 }
 
