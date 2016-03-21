@@ -51,7 +51,7 @@ tira_header_pagina <- function(texto, tj = 'TJSP'){
       stringi::stri_replace_all(regex = '\f[0-9].*?de2016|[\f\r]', replacement = '')
   } else if (tj %in% c('TJSP','TJAL')){
     texto %<>% 
-      stringi::stri_replace_all(regex = '[\f :alpha]', replacement = '') %>% 
+      stringi::stri_replace_all(regex = '[\f ]', replacement = '') %>% 
       stringi::stri_replace_all(regex = 'PublicaçãoOficialdoTribunal.*?Edição[0-9]{3,6}', replacement = '')
   } 
   return(texto)
