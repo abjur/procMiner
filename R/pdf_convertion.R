@@ -117,5 +117,5 @@ saj2cnj <- function(nro_processo, orgao, tr){
       n_processo = sprintf('0%s20%s%s%s0%s',X3,X2,orgao,tr,X1),
       dig = calcula_digito(n_processo),
       n_processo = sprintf('0%s-%s.20%s.%s.%s.0%s',X3,dig,X2,orgao,tr,X1)) %>% 
-    dplyr::select(nro_processo)
+    dplyr::select(n_processo)
 }
