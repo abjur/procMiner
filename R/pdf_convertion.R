@@ -108,18 +108,16 @@ calcula_digito <- function(num, monta = FALSE) {
   }
   return(dig)
 }	
-990.08.180402-6
 
 #' @export
-2cnj <- function(n_processo, orgao, tr){
+convert2cnj <- function(n_processo, orgao, tr){
   n_processo %<>%
     stringi::stri_replace_all_regex('[./-]',replacement = '') %>%
     stringi::stri_sub(1,15)
 
   if(nchar(n_processo) == 15){
     n1 = stringi::stri_sub(n_processo, 1,3)
-    n2 = stringi::stri_sub(n_processo, 6	
-                           990.08.180402-6,9)
+    n2 = stringi::stri_sub(n_processo, 6,9)
     n3 = stringi::stri_sub(n_processo, 10,15)
     dig = calcula_digito(sprintf('0%s%s%s%s0%s',n3,n2,orgao,tr,n1))
     return(sprintf('0%s-%s.%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
