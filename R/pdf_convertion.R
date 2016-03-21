@@ -11,13 +11,14 @@ formatos <- function(orgao = '8', tr = '26'){
 }
 
 #' @export
-pdf2text <- function(a, first_pg = NA, last_pg = NA, raw = F, keep_file = F, new_file = "repo.txt"){
+pdf2text <- function(a, first_pg = NA, last_pg = NA, r = F, keep_file = F, new_file = 'repo.txt'){
   
   if(!file.exists(a)){return('')}
   
   if(file.size(a) > 5000 & stringi::stri_detect(a,fixed = '.pdf')){
-    sprintf('pdftotext %s%s%s%s',
-            ifelse(raw,'-raw ',' '),
+    sprintf('pdftotext %s %s%s%s%s',
+            a,
+            ifelse(r,'-raw ',' '),
             ifelse(!is.na(first_pg),paste('-f',first_pg,''),' '),
             ifelse(!is.na(last_pg),paste('-l',last_pg,''),' '),
             new_file) %>% 
@@ -50,7 +51,7 @@ tira_header_pagina <- function(texto, tj = 'TJSP'){
       stringi::stri_replace_all(regex = '\f[0-9].*?de2016|[\f\r]', replacement = '')
   } else if (tj %in% c('TJSP','TJAL')){
     texto %<>% 
-      stringi::stri_replace_all(regex = '[\f ]', replacement = '') %>% 
+      stringi::stri_replace_all(regex = '[\f :alpha]', replacement = '') %>% 
       stringi::stri_replace_all(regex = 'PublicaçãoOficialdoTribunal.*?Edição[0-9]{3,6}', replacement = '')
   } 
   return(texto)
@@ -112,8 +113,9 @@ saj2cnj <- function(nro_processo, orgao, tr){
   nro_processo %>% 
     stringr::str_split_fixed('[\\-\\.]',4) %>%
     data.frame() %>%
-    dplyr::transmute(nro_processo = sprintf('0%s20%s%s%s0%s',X3,X2,orgao,tr,X1),
-      dig = calcula_digito(nro_processo),
-      nro_processo = sprintf('0%s-%s.20%s.%s.%s.0%s',X3,dig,X2,orgao,tr,X1)) %>% 
+    dplyr::transmute(
+      n_processo = sprintf('0%s20%s%s%s0%s',X3,X2,orgao,tr,X1),
+      dig = calcula_digito(n_processo),
+      n_processo = sprintf('0%s-%s.20%s.%s.%s.0%s',X3,dig,X2,orgao,tr,X1)) %>% 
     dplyr::select(nro_processo)
 }
