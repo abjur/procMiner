@@ -1,5 +1,5 @@
 #' @export
-formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = '8', tr = '26'){
+formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = 8, tr = 26){
   sprintf('%s%s%s%s',
     #formato CNJ - 2008
     ifelse(cnj,sprintf('[0-9]{7}\\-[0-9]{2}\\.[0-9]{4}\\.%s\\.%s\\.[0-9]{4}',orgao,tr),''),
@@ -60,9 +60,9 @@ tira_header_pagina <- function(texto, tj = 'TJSP'){
 }
 
 #' @export
-extrai_processos_arq <- function(a,orgao = '8', tr = '26', r = F, tj= 'TJSP', save_file = T){
+extrai_processos_arq <- function(a,orgao = 8, tr = 26, r = F, tj= 'TJSP', save_file = T){
   d = a %>%
-    pdf2text(raw = r) %>%
+    pdf2text(r = r) %>%
     encontra_processos(orgao, tr, tj)
   
   if(save_file){saveRDS(d,file = stringi::stri_replace(a, fixed = '.pdf', replacement = '.rds'))}
@@ -71,7 +71,7 @@ extrai_processos_arq <- function(a,orgao = '8', tr = '26', r = F, tj= 'TJSP', sa
 }
 
 #' @export
-extrai_processos <- function(lista_arquivos, orgao = '8', tr = '26', raw = F, tj = 'TJSP'){
+extrai_processos <- function(lista_arquivos, orgao = 8, tr = 26, raw = F, tj = 'TJSP'){
   dplyr::data_frame(arq = lista_arquivos) %>%
     dplyr::group_by(arq) %>%
     dplyr::do(extrai_processos_arq(.$arq, orgao,tr,raw)) %>%
