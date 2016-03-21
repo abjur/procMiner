@@ -14,16 +14,16 @@ formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = 8, tr = 26
 
 #' @export
 pdf2text <- function(a, first_pg = NA, last_pg = NA, r = F, keep_file = F, new_file = 'repo.txt'){
-  
+
   if(!file.exists(a)){return('')}
-  
+
   if(file.size(a) > 5000 & stringi::stri_detect(a,fixed = '.pdf')){
     sprintf('pdftotext %s %s%s%s%s',
             a,
             ifelse(r,'-raw ',' '),
             ifelse(!is.na(first_pg),paste('-f',first_pg,''),' '),
             ifelse(!is.na(last_pg),paste('-l',last_pg,''),' '),
-            new_file) %>% 
+            new_file) %>%
       system()
     texto = readr::read_file(new_file)
     ifelse(keep_file,NA,file.remove(new_file))
@@ -36,26 +36,26 @@ pdf2text <- function(a, first_pg = NA, last_pg = NA, r = F, keep_file = F, new_f
 #' @export
 encontra_processos <- function(texto, orgao = '8', tr = '26', tj = 'TJSP'){
   texto %>%
-    tira_header_pagina(tj) %>% 
+    tira_header_pagina(tj) %>%
     stringi::stri_extract_all(regex = formatos(orgao,tr)) %>%
     dplyr::first() %>%
     dplyr::data_frame() %>%
-    setNames('n_processo') %>% 
+    setNames('n_processo') %>%
     dplyr::distinct(n_processo)
 }
 
 #' @export
 tira_header_pagina <- function(texto, tj = 'TJSP'){
-  texto %<>% 
+  texto %<>%
     stringi::stri_replace_all(regex = '\n', replacement = '')
   if(tj == 'TJSC'){
-    texto %<>% 
+    texto %<>%
       stringi::stri_replace_all(regex = '\f[0-9].*?de2016|[\f\r]', replacement = '')
   } else if (tj %in% c('TJSP','TJAL')){
-    texto %<>% 
-      stringi::stri_replace_all(regex = '[\f ]', replacement = '') %>% 
+    texto %<>%
+      stringi::stri_replace_all(regex = '[\f ]', replacement = '') %>%
       stringi::stri_replace_all(regex = 'PublicaçãoOficialdoTribunal.*?Edição[0-9]{3,6}', replacement = '')
-  } 
+  }
   return(texto)
 }
 
@@ -64,9 +64,9 @@ extrai_processos_arq <- function(a,orgao = 8, tr = 26, r = F, tj= 'TJSP', save_f
   d = a %>%
     pdf2text(r = r) %>%
     encontra_processos(orgao, tr, tj)
-  
+
   if(save_file){saveRDS(d,file = stringi::stri_replace(a, fixed = '.pdf', replacement = '.rds'))}
-  
+
   return(d)
 }
 
@@ -81,10 +81,10 @@ extrai_processos <- function(lista_arquivos, orgao = 8, tr = 26, raw = F, tj = '
 
 #' @export
 tipo_n_procesos <- function(d){
-  d %>% 
-    dplyr::select(n_processo) %>% 
-    dplyr::first() %>% 
-    stringi::stri_length() %>% 
+  d %>%
+    dplyr::select(n_processo) %>%
+    dplyr::first() %>%
+    stringi::stri_length() %>%
     table()
 }
 
@@ -109,15 +109,26 @@ calcula_digito <- function(num, monta = FALSE) {
   return(dig)
 }
 
-#' 
-#' @export 
-saj2cnj <- function(nro_processo, orgao, tr){
-  nro_processo %>% 
-    stringr::str_split_fixed('[\\-\\.]',4) %>%
-    data.frame() %>%
-    dplyr::transmute(
-      n_processo = sprintf('0%s20%s%s%s0%s',X3,X2,orgao,tr,X1),
-      dig = calcula_digito(n_processo),
-      n_processo = sprintf('0%s-%s.20%s.%s.%s.0%s',X3,dig,X2,orgao,tr,X1)) %>% 
-    dplyr::select(n_processo)
+#' @export
+2cnj <- function(n_processo, orgao, tr){
+  n_processo %<>%
+    stringi::stri_replace_all_regex('[./-]',replacement = '') %>%
+    stringi::stri_sub(1,15)
+
+  if(nchar(n_processo) == 15){
+    n1 = stringi::stri_sub(n_processo, 1,3)
+    n2 = stringi::stri_sub(n_processo, 6,9)
+    n3 = stringi::stri_sub(n_processo, 10,15)
+    dig = calcula_digito(sprintf('0%s%s%s%s0%s',n3,n2,orgao,tr,n1))
+    return(sprintf('0%s-%s.%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
+  }
+
+  if(nchar(n_processo) == 12){
+    n1 = stringi::stri_sub(n_processo, 1,3)
+    n2 = stringi::stri_sub(n_processo, 4,5)
+    n3 = stringi::stri_sub(n_processo, 6,11)
+    dig = calcula_digito(sprintf('0%s20%s%s%s0%s',n3,n2,orgao,tr,n1))
+    return(sprintf('0%s-%s.20%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
+  }
+
 }
