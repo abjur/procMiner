@@ -110,24 +110,19 @@ calcula_digito <- function(num, monta = FALSE) {
 }	
 
 #' @export
-convert2cnj <- function(n_processo, orgao, tr){
-  backup = n_processo
-  n_processo %<>%
-    stringi::stri_replace_all_regex('[./-]',replacement = '') %>%
-    stringi::stri_sub(1,15)
-
-  if(nchar(n_processo) == 15){
-    n1 = stringi::stri_sub(n_processo, 1,3)
-    n2 = stringi::stri_sub(n_processo, 6,9)
-    n3 = stringi::stri_sub(n_processo, 10,15)
-    dig = calcula_digito(sprintf('0%s%s%s%s0%s',n3,n2,orgao,tr,n1))
-    return(sprintf('0%s-%s.%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
-  } else if(nchar(n_processo) == 12){
-    n1 = stringi::stri_sub(n_processo, 1,3)
-    n2 = stringi::stri_sub(n_processo, 4,5)
-    n3 = stringi::stri_sub(n_processo, 6,11)
-    dig = calcula_digito(sprintf('0%s20%s%s%s0%s',n3,n2,orgao,tr,n1))
-    return(sprintf('0%s-%s.20%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
+saj_prodesp2cnj <- function(d, orgao, tr){
+  d %>%
+    mutate(n_processo2 = stri_replace_all_regex(n_processo,'[.-]',replacement =''),
+           nchar = stri_length(n_processo2),
+           n1 = stri_sub(n_processo2,1,3),
+           n2 = ifelse(nchar > 14, stri_sub(n_processo2,6,9), 
+                       ifelse(stri_sub(n_processo2,4,5) %>% as.numeric < 17, 
+                              paste0('20',stri_sub(n_processo2,4,5)),
+                              paste0('19',stri_sub(n_processo2,4,5)))),
+           n3 = ifelse(nchar > 14, stri_sub(n_processo2,10,15),  stri_sub(n_processo2,6,11)),
+           n_processo = ifelse(nchar == 20,n_processo,calcula_digito(sprintf('0%s%s%s%s0%s',n3,n2,orgao,tr,n1),T)),
+           n1 = NULL,
+           n2 = NULL,
+           n3 = NULL,
+           n_processo2 = NULL)
   }
-  return(backup)
-}
