@@ -125,5 +125,6 @@ saj_prodesp2cnj <- function(d, orgao, tr){
            n1 = NULL,
            n2 = NULL,
            n3 = NULL,
-           n_processo2 = NULL)
+           n_processo2 = NULL,
+           nchar = NULL)
   }
