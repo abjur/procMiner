@@ -113,14 +113,14 @@ calcula_digito <- function(num, monta = FALSE) {
 #' @export
 saj_prodesp2cnj <- function(d, orgao, tr){
   d %>%
-    mutate(n_processo2 = stri_replace_all_regex(n_processo,'[.-]',replacement =''),
-           nchar = stri_length(n_processo2),
-           n1 = stri_sub(n_processo2,1,3),
-           n2 = ifelse(nchar > 14, stri_sub(n_processo2,6,9), 
-                       ifelse(stri_sub(n_processo2,4,5) %>% as.numeric < 17, 
-                              paste0('20',stri_sub(n_processo2,4,5)),
-                              paste0('19',stri_sub(n_processo2,4,5)))),
-           n3 = ifelse(nchar > 14, stri_sub(n_processo2,10,15),  stri_sub(n_processo2,6,11)),
+    mutate(n_processo2 = stringi::stri_replace_all_regex(n_processo,'[.-]',replacement =''),
+           nchar = stringi::stri_length(n_processo2),
+           n1 = stringi::stri_sub(n_processo2,1,3),
+           n2 = ifelse(nchar > 14, stringi::stri_sub(n_processo2,6,9), 
+                       ifelse(stringi::stri_sub(n_processo2,4,5) %>% as.numeric < 17, 
+                              paste0('20',stringi::stri_sub(n_processo2,4,5)),
+                              paste0('19',stringi::stri_sub(n_processo2,4,5)))),
+           n3 = ifelse(nchar > 14, stringi::stri_sub(n_processo2,10,15),  stringi::stri_sub(n_processo2,6,11)),
            n_processo = ifelse(nchar == 20,n_processo,calcula_digito(sprintf('0%s%s%s%s0%s',n3,n2,orgao,tr,n1),T)),
            n1 = NULL,
            n2 = NULL,
