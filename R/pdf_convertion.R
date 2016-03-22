@@ -111,6 +111,7 @@ calcula_digito <- function(num, monta = FALSE) {
 
 #' @export
 convert2cnj <- function(n_processo, orgao, tr){
+  backup = n_processo
   n_processo %<>%
     stringi::stri_replace_all_regex('[./-]',replacement = '') %>%
     stringi::stri_sub(1,15)
@@ -121,14 +122,12 @@ convert2cnj <- function(n_processo, orgao, tr){
     n3 = stringi::stri_sub(n_processo, 10,15)
     dig = calcula_digito(sprintf('0%s%s%s%s0%s',n3,n2,orgao,tr,n1))
     return(sprintf('0%s-%s.%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
-  }
-
-  if(nchar(n_processo) == 12){
+  } else if(nchar(n_processo) == 12){
     n1 = stringi::stri_sub(n_processo, 1,3)
     n2 = stringi::stri_sub(n_processo, 4,5)
     n3 = stringi::stri_sub(n_processo, 6,11)
     dig = calcula_digito(sprintf('0%s20%s%s%s0%s',n3,n2,orgao,tr,n1))
     return(sprintf('0%s-%s.20%s.%s.%s.0%s',n3,dig,n2,orgao,tr,n1))
   }
-
+  return(backup)
 }
