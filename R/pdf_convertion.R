@@ -84,7 +84,7 @@ tipo_n_procesos <- function(d){
   d %>%
     dplyr::select(n_processo) %>%
     dplyr::first() %>%
-    stringi::stri_replace_all_regex('[.-]',replacement = '')
+    stringi::stri_replace_all_regex('[.-]',replacement = '') %>% 
     stringi::stri_length() %>%
     table()
 }
