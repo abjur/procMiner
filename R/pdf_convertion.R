@@ -113,6 +113,7 @@ calcula_digito <- function(num, monta = FALSE) {
 #' @export
 saj_prodesp2cnj <- function(d, orgao, tr){
   d %>%
+    dplyr::filter(!is.na(n_processo)) %>% 
     dplyr::mutate(n_processo = stringi::stri_replace_all_regex(n_processo,'[.-]',replacement =''),
            nchar = stringi::stri_length(n_processo),
            n1 = stringi::stri_sub(n_processo,1,3),
