@@ -1,3 +1,4 @@
+#' Formatos encontrados no TJSP e TJAL
 #' @export
 formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = 8, tr = 26){
   sprintf('%s%s%s%s',
