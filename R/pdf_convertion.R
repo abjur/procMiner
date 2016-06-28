@@ -1,4 +1,5 @@
 #' Formatos encontrados no TJSP e TJAL
+#' 
 #' @export
 formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = 8, tr = 26){
   sprintf('%s%s%s%s',
@@ -13,6 +14,8 @@ formatos <- function(cnj = T, prodesp = T, saj = T, tjal = T, orgao = 8, tr = 26
   )
 }
 
+#' PDF para Texto
+#' 
 #' @export
 pdf2text <- function(a, first_pg = NA, last_pg = NA, r = F, keep_file = F, new_file = 'repo.txt'){
 
